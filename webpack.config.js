@@ -2,14 +2,16 @@ var webpack = require('webpack');
 var path = require('path');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 var ETWP = require('extract-text-webpack-plugin');
+var CleanWebpackPlugin = require('clean-webpack-plugin');
 
 var isProduction = process.env.NODE_ENV === 'production';
+//prefix css and minimize in production mode
 var processCss = isProduction ? '?minimize!postcss-loader' : '';
 
 console.log('是否生产环境:' + isProduction);
 
 var config = {
-    devtool: 'source-map',
+    devtool: 'source-map', //Error code hints
     context: path.join(__dirname, 'src/app'),
     //define entry point
     entry: {
@@ -21,7 +23,8 @@ var config = {
     //define output point
     output: {
         path: path.join(__dirname, 'dist'),
-        filename: '[name].bundle.js'
+        filename: isProduction ? '[name].[chunkhash].bundle.js' : '[name].bundle.js'
+        // filename: '[name].[chunkhash].bundle.js'
     },
 
     //loader
@@ -33,7 +36,7 @@ var config = {
                 loader: 'jshint-loader',
                 exclude: /node_modules/,
                 options: {
-                    esversion : 6,
+                    esversion: 6,
                     emitErrors: true,
                     failOnHint: true
                 }
@@ -66,11 +69,11 @@ var config = {
     resolve: {
         alias: {
             styles: path.join(__dirname, 'src/css'),
-            images: path.join(__dirname, 'src/assets')
+            images: path.join(__dirname, 'src/assets'),
         }
     },
 
-//devServer
+    //devServer
     devServer: {
         contentBase: path.join(__dirname, 'dist'),
         inline: true,
@@ -95,23 +98,30 @@ var config = {
             filename: 'about.html',
             excludeChunks: ['home', 'index']
         }),
-        new webpack.HotModuleReplacementPlugin(),
+       // new webpack.HotModuleReplacementPlugin(),
+        //extract common chunk
         new webpack.optimize.CommonsChunkPlugin({
             name: 'common',
             chunks: ['home', 'about']
         }),
+        //extract internal css to external css file
         new ETWP({
-            filename: '[name].css',
+            filename: '[name].[contenthash].css',
             allChunks: true,
             disable: !isProduction
-        })
+        }),
+        //clean the dist or build directory
+        new CleanWebpackPlugin(['dist', 'build'])
     ]
 }
 
 if (isProduction) {
+    //minimize javascript file
     config.plugins.push(new webpack.optimize.UglifyJsPlugin({
         comments: false
     }));
+} else {
+    config.plugins.push(new webpack.HotModuleReplacementPlugin());
 }
 
 module.exports = config;
