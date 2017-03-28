@@ -5,6 +5,9 @@ import Page from './index';
 import 'styles/global.scss';
 import 'styles/about.scss';
 import Footer from './footer';
+import moment from 'moment';
+
+console.log(moment().format());
 
 const About = () => `
         <section class="about">

@@ -6,6 +6,9 @@ import Page from './index';
 import 'styles/global.scss';
 import 'styles/home.scss';
 import Footer from './footer';
+import moment from 'moment';
+
+console.log(moment().format());
 
 const Home = () => `
             <section class="home">

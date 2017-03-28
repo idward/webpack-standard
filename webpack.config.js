@@ -17,14 +17,14 @@ var config = {
     entry: {
         'index': [path.join(__dirname, 'node_modules/webpack/hot/dev-server')],
         'home': './home.js',
-        'about': './about.js'
+        'about': './about.js',
+        'vendor': ['moment','jquery']
     },
 
     //define output point
     output: {
         path: path.join(__dirname, 'dist'),
         filename: isProduction ? '[name].[chunkhash].bundle.js' : '[name].bundle.js'
-        // filename: '[name].[chunkhash].bundle.js'
     },
 
     //loader
@@ -98,11 +98,11 @@ var config = {
             filename: 'about.html',
             excludeChunks: ['home', 'index']
         }),
-       // new webpack.HotModuleReplacementPlugin(),
+        // new webpack.HotModuleReplacementPlugin(),
         //extract common chunk
         new webpack.optimize.CommonsChunkPlugin({
-            name: 'common',
-            chunks: ['home', 'about']
+            name: ['vendor'],
+            // chunks: ['home', 'about']
         }),
         //extract internal css to external css file
         new ETWP({
